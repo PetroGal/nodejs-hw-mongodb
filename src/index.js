@@ -1,3 +1,3 @@
-import createFakeContact from './utils/createFakeContact.js';
+import { setupServer } from '../server.js';
 
-console.log(createFakeContact());
+setupServer();
