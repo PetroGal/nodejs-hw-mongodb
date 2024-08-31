@@ -1,3 +1,9 @@
-import createFakeContact from './utils/createFakeContact.js';
+import { setupServer } from '../server.js';
+import { initMongoDB } from './db/initMongoConnection.js';
 
-console.log(createFakeContact());
+const bootstrap = async () => {
+  await initMongoDB();
+  setupServer();
+};
+
+bootstrap();
