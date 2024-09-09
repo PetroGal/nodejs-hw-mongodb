@@ -18,11 +18,9 @@ export const setupServer = () => {
     },
   });
 
-  // app.use(logger);
+  app.use(logger);
   app.use(cors());
   app.use(express.json());
-
-  // routes
 
   // app.get('/', (req, res) => {
   //   res.json({
@@ -30,7 +28,6 @@ export const setupServer = () => {
   //   });
   // });
 
-  // Додаємо роутер до app як middleware
   app.use(contactsRouter);
   app.use('*', notFoundHandler);
   app.use(errorHandler);
@@ -38,12 +35,6 @@ export const setupServer = () => {
   app.use((req, res) => {
     res.status(404).json({ message: 'Not found' });
   });
-
-  // app.use((error, req, res, next) => {
-  //   res.status(500).json({
-  //     message: error.message,
-  //   });
-  // });
 
   app.listen(port, () => console.log(`Server is running on port ${port}`));
 };
