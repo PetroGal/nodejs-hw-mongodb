@@ -18,23 +18,6 @@ export const deleteContact = async (contactId) => {
   return contact;
 };
 
-// export const updateContact = async (contactId, payload, options = {}) => {
-//   const rawResult = await ContactCollection.findOneAndUpdate(
-//     {
-//       _id: contactId,
-//     },
-//     payload,
-//     { new: true, includeResultMetadata: true, ...options },
-//   );
-
-//   if (!rawResult || !rawResult.value) {
-//     return {
-//       contact: rawResult.value,
-//       isNew: Boolean(rawResult?.lastErrorObject?.upserted),
-//     };
-//   }
-// };
-
 export const updateContact = async (contactId, payload) => {
   try {
     // Validate the contactId is a valid ObjectId
