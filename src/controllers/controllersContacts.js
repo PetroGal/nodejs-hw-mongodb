@@ -1,32 +1,53 @@
 import {
   createContact,
-  getAllContacts,
+  getContacts,
   getContactById,
-} from '../services/contacts.js';
+} from '../services/servicesContacts.js';
 import createHttpError from 'http-errors';
 
-import { deleteContact } from '../services/contacts.js';
-import { updateContact } from '../services/contacts.js';
+import { deleteContact } from '../services/servicesContacts.js';
+import { updateContact } from '../services/servicesContacts.js';
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 import { parseSortParams } from '../utils/parseSortParams.js';
+import { parseContactFilterParams } from '../utils/filters/parseContactFilterParams.js';
 
-export const getContactsController = async (req, res) => {
-  const { page, perPage } = parsePaginationParams(req.querry);
+export const getContactsController = async (req, res, next) => {
+  // const { page, perPage } = parsePaginationParams(req.query);
+  // const { sortBy, sortOrder } = parseSortParams(req.query);
+  // const filter = parseContactFilterParams(req.query);
+  // const contacts = await getContacts({
+  //   page,
+  //   perPage,
+  //   sortBy,
+  //   sortOrder,
+  //   filter,
+  // });
+  // res.json({
+  //   status: 200,
+  //   message: 'Successfully found contacts!',
+  //   data: contacts,
+  // });
+  try {
+    const { page, perPage } = parsePaginationParams(req.query);
+    const { sortBy, sortOrder } = parseSortParams(req.query);
+    const filter = parseContactFilterParams(req.query);
 
-  const { sortBy, sortOrder } = parseSortParams(req.query);
+    const contacts = await getContacts({
+      page,
+      perPage,
+      sortBy,
+      sortOrder,
+      filter,
+    });
 
-  const contacts = await getAllContacts({
-    page,
-    perPage,
-    sortBy,
-    sortOrder,
-  });
-
-  res.json({
-    status: 200,
-    message: 'Successfully found contacts!',
-    data: contacts,
-  });
+    res.json({
+      status: 200,
+      message: 'Successfully found contacts!',
+      data: contacts,
+    });
+  } catch (error) {
+    next(error); // Pass error to the error handler
+  }
 };
 
 export const getContactByIdController = async (req, res) => {

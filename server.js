@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import pino from 'pino-http';
-import contactsRouter from './src/routers/contacts.js'; // Імпортуємо роутер
+import contactsRouter from './src/routers/routersContacts.js'; // Імпортуємо роутер
 import { env } from './src/utils/env.js';
 // import * as contactServices from './src/services/contacts.js';
 import { errorHandler } from './src/middlewares/errorHandler.js';

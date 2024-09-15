@@ -1,28 +1,32 @@
 import { SORT_ORDER } from '../constants/index.js';
-import ContactCollection from '../db/models/Contact.js';
+import ContactCollection from '../db/models/modelContact.js';
 import mongoose from 'mongoose';
 import { calculatePaginationData } from '../utils/calculatePaginationData.js';
 
-export const getAllContacts = async ({
-  page = 1,
-  perPage = 10,
+export const getContacts = async ({
+  page,
+  perPage,
   sortOrder = SORT_ORDER.ASC,
   sortBy = '_id',
+  filter = {},
 }) => {
   const limit = perPage;
   const skip = (page - 1) * perPage;
 
   const contactsQuery = ContactCollection.find();
-  const contactsCount = await ContactCollection.find()
-    .merge(contactsQuery)
-    .countDocuments();
 
-  const contacts = await contactsQuery
-    .skip(skip)
-    .limit(limit)
-    .sort({ [sortBy]: sortOrder })
-    .exec();
+  if (filter.contactType) {
+    contactsQuery.where('contactType').equals(filter.contactType);
+  }
 
+  const [contactsCount, contacts] = await Promise.all([
+    ContactCollection.find().merge(contactsQuery).countDocuments(),
+    contactsQuery
+      .skip(skip)
+      .limit(limit)
+      .sort({ [sortBy]: sortOrder })
+      .exec(),
+  ]);
   const paginationData = calculatePaginationData(contactsCount, perPage, page);
 
   return {
@@ -48,20 +52,18 @@ export const deleteContact = async (contactId) => {
 
 export const updateContact = async (contactId, payload) => {
   try {
-    // Validate the contactId is a valid ObjectId
+    // Validated the contactId is a valid ObjectId
     if (!mongoose.Types.ObjectId.isValid(contactId)) {
       console.log(`Invalid ObjectId: ${contactId}`);
       return null;
     }
 
-    // Perform the update
     const updatedContact = await ContactCollection.findOneAndUpdate(
       { _id: contactId },
       payload,
       { new: true },
     );
 
-    // Log the result of the update operation
     console.log('Update operation result:', updatedContact);
 
     return updatedContact;

@@ -5,11 +5,11 @@ import {
   createContactController,
   deleteContactController,
   patchContactController,
-} from '../controllers/contacts.js';
+} from '../controllers/controllersContacts.js';
 import { ctrlWrapper } from '../utils/ctrlWrapper.js';
 import { validateBody } from '../utils/validateBody.js';
-import { createContactSchema } from '../validation/contacts.js';
-import { updateContactSchema } from '../validation/contacts.js';
+import { createContactSchema } from '../validation/validationContacts.js';
+import { updateContactSchema } from '../validation/validationContacts.js';
 import { isValidId } from '../middlewares/isValidId.js';
 
 const router = Router();
@@ -28,7 +28,7 @@ router.post(
   ctrlWrapper(createContactController),
 );
 
-router.delete('/contacts/:contactId', deleteContactController);
+router.delete('/contacts/:contactId', ctrlWrapper(deleteContactController));
 
 router.patch(
   '/contacts/:contactId',

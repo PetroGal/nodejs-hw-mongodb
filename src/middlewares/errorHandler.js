@@ -1,4 +1,3 @@
-// Імпортуємо клас HttpError для обробки помилок HTTP з відповідними статус-кодами
 import { HttpError } from 'http-errors';
 
 export const errorHandler = (err, req, res, next) => {
