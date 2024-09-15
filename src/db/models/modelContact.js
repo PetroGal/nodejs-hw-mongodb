@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { contactTypeList } from '../../constants/contacts.js';
+import { contactTypeList } from '../../constants/constantsContacts.js';
 
 const contactSchema = new Schema(
   {
@@ -14,7 +14,7 @@ const contactSchema = new Schema(
     email: {
       type: String,
     },
-    isFavourite: {
+    isFavorite: {
       type: Boolean,
       default: false,
     },
@@ -29,5 +29,15 @@ const contactSchema = new Schema(
 );
 
 const ContactCollection = model('contact', contactSchema);
+
+export const sortFields = [
+  'name',
+  'phoneNumber',
+  'email',
+  'isFavorite',
+  'contactType',
+  'createdAt',
+  'updatedAt',
+];
 
 export default ContactCollection;
