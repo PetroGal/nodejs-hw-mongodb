@@ -1,7 +1,7 @@
 import {
   createContact,
   getContacts,
-  getContactById,
+  getContact,
 } from '../services/servicesContacts.js';
 import createHttpError from 'http-errors';
 
@@ -12,32 +12,21 @@ import { parseSortParams } from '../utils/parseSortParams.js';
 import { parseContactFilterParams } from '../utils/filters/parseContactFilterParams.js';
 
 export const getContactsController = async (req, res, next) => {
-  // const { page, perPage } = parsePaginationParams(req.query);
-  // const { sortBy, sortOrder } = parseSortParams(req.query);
-  // const filter = parseContactFilterParams(req.query);
-  // const contacts = await getContacts({
-  //   page,
-  //   perPage,
-  //   sortBy,
-  //   sortOrder,
-  //   filter,
-  // });
-  // res.json({
-  //   status: 200,
-  //   message: 'Successfully found contacts!',
-  //   data: contacts,
-  // });
+  console.log('Request received for /contacts');
+  console.log('Query params: ', req.query);
   try {
     const { page, perPage } = parsePaginationParams(req.query);
     const { sortBy, sortOrder } = parseSortParams(req.query);
     const filter = parseContactFilterParams(req.query);
+
+    const { _id: userId } = req.user;
 
     const contacts = await getContacts({
       page,
       perPage,
       sortBy,
       sortOrder,
-      filter,
+      filter: { ...filter, userId },
     });
 
     res.json({
@@ -46,16 +35,17 @@ export const getContactsController = async (req, res, next) => {
       data: contacts,
     });
   } catch (error) {
-    next(error); // Pass error to the error handler
+    next(error);
   }
 };
 
 export const getContactByIdController = async (req, res) => {
   const { contactId } = req.params;
-  const contact = await getContactById(contactId);
+  const { _id: userId } = req.user;
+  const contact = await getContact({ _id: contactId, userId });
 
   if (!contact) {
-    throw createHttpError(404, 'Contact not found');
+    throw createHttpError(404, `Contact with id ${contactId} not found`);
   }
 
   res.json({
@@ -66,8 +56,9 @@ export const getContactByIdController = async (req, res) => {
 };
 
 export const createContactController = async (req, res) => {
-  const contact = await createContact(req.body);
+  const { _id: userId } = req.user;
 
+  const contact = await createContact({ ...req.body, userId });
   res.status(201).json({
     status: 201,
     message: 'Successfully created a contact!',
@@ -77,21 +68,27 @@ export const createContactController = async (req, res) => {
 
 export const deleteContactController = async (req, res, next) => {
   const { contactId } = req.params;
+  const { _id: userId } = req.user;
 
-  const contact = await deleteContact(contactId);
+  const contact = await deleteContact(contactId, userId);
 
   if (!contact) {
     next(createHttpError(404, 'Contact not found'));
     return;
   }
   res.status(204).send();
+
+  if (!contactId) {
+    next(createHttpError());
+  }
 };
 
 export const patchContactController = async (req, res, next) => {
   const { contactId } = req.params;
+  const { _id: userId } = req.user;
   console.log('Received contactId:', contactId);
 
-  const result = await updateContact(contactId, req.body);
+  const result = await updateContact(contactId, userId, req.body);
 
   if (!result) {
     next(createHttpError(404, 'Contact not found'));

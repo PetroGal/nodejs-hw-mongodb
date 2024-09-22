@@ -1,5 +1,5 @@
 import { SORT_ORDER } from '../constants/index.js';
-import ContactCollection from '../db/models/modelContact.js';
+import ContactCollection from '../db/models/ModelContact.js';
 import mongoose from 'mongoose';
 import { calculatePaginationData } from '../utils/calculatePaginationData.js';
 
@@ -19,6 +19,10 @@ export const getContacts = async ({
     contactsQuery.where('contactType').equals(filter.contactType);
   }
 
+  if (filter.userId) {
+    contactsQuery.where('userId').eq(filter.userId);
+  }
+
   const [contactsCount, contacts] = await Promise.all([
     ContactCollection.find().merge(contactsQuery).countDocuments(),
     contactsQuery
@@ -35,8 +39,7 @@ export const getContacts = async ({
   };
 };
 
-export const getContactById = (contactId) =>
-  ContactCollection.findById(contactId);
+export const getContact = (filter) => ContactCollection.findById(filter);
 
 export const createContact = async (payload) => {
   const contact = await ContactCollection.create(payload);
@@ -71,4 +74,18 @@ export const updateContact = async (contactId, payload) => {
     console.error('Error updating contact:', error);
     return null;
   }
+};
+
+export const updateMovie = async (filter, data, options = {}) => {
+  const rawResult = await ContactCollection.findOneAndUpdate(filter, data, {
+    includeResultMetadata: true,
+    ...options,
+  });
+
+  if (!rawResult || !rawResult.value) return null;
+
+  return {
+    data: rawResult.value,
+    isNew: Boolean(rawResult?.lastErrorObject?.upserted),
+  };
 };
