@@ -5,18 +5,16 @@ import * as servicesAuth from '../services/servicesAuth.js';
 const authenticate = async (req, res, next) => {
   // const {authorization} = req.headers;
 
-  console.log('Authorization:', authorization); // Log the header
-  console.log('Bearer token:', token); // Log the token part
-  console.log('Session:', session); // Log the session found
-  console.log('User:', user); // Log the user found
-
   const authorization = req.get('Authorization');
+  // console.log('Authorization:', authorization);
 
   if (!authorization) {
     return next(createHttpError(401, 'Authorization header not found'));
   }
 
   const [bearer, token] = authorization.split(' ');
+
+  // console.log('Bearer token:', token);
 
   if (bearer !== 'Bearer') {
     return next(
@@ -25,6 +23,8 @@ const authenticate = async (req, res, next) => {
   }
 
   const session = await servicesAuth.findSessionByAccessToken(token);
+
+  // console.log('Session:', session);
 
   if (!session) {
     return next(createHttpError(401, 'Session is not found'));
