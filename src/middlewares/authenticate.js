@@ -4,6 +4,12 @@ import * as servicesAuth from '../services/servicesAuth.js';
 
 const authenticate = async (req, res, next) => {
   // const {authorization} = req.headers;
+
+  console.log('Authorization:', authorization); // Log the header
+  console.log('Bearer token:', token); // Log the token part
+  console.log('Session:', session); // Log the session found
+  console.log('User:', user); // Log the user found
+
   const authorization = req.get('Authorization');
 
   if (!authorization) {
