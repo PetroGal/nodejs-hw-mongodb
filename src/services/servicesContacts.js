@@ -67,6 +67,11 @@ export const updateContact = async (contactId, payload) => {
       { new: true },
     );
 
+    if (!updatedContact) {
+      console.error(`No contact found for ID: ${contactId}`);
+      throw new Error('Contact not found'); // Or return null as appropriate
+    }
+
     console.log('Update operation result:', updatedContact);
 
     return updatedContact;
