@@ -22,7 +22,7 @@ const createSession = () => {
   };
 };
 
-export const signup = async (payload) => {
+export const register = async (payload) => {
   const { email, password } = payload;
 
   const user = await UserCollection.findOne({ email });
@@ -41,7 +41,7 @@ export const signup = async (payload) => {
   return data._doc;
 };
 
-export const signin = async (payload) => {
+export const login = async (payload) => {
   const { email, password } = payload;
   const user = await UserCollection.findOne({ email });
 
@@ -103,8 +103,14 @@ export const refreshSession = async ({ refreshToken, sessionId }) => {
   return userSession;
 };
 
-export const signout = async (sessionId) => {
+export const logout = async (sessionId) => {
   await SessionCollection.deleteOne({ _id: sessionId });
 };
 
+export const requestResetToken = async (email) => {
+  const user = await UserCollection.findOne({ email });
+  if (!user) {
+    throw createHttpError(404, 'User not found');
+  }
+};
 export const findUser = (filter) => UserCollection.findOne(filter);

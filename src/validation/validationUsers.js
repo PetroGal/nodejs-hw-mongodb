@@ -1,7 +1,7 @@
 import Joi from 'joi';
 import { emailRegexp } from '../constants/constantsUsers.js';
 
-export const userSignUpSchema = Joi.object({
+export const userregisterSchema = Joi.object({
   name: Joi.string()
     .min(3)
     .max(20)
@@ -15,7 +15,7 @@ export const userSignUpSchema = Joi.object({
   password: Joi.string().required(),
 });
 
-export const userSignInSchema = Joi.object({
+export const userloginSchema = Joi.object({
   email: Joi.string().pattern(emailRegexp).required(),
   password: Joi.string().required(),
 });
