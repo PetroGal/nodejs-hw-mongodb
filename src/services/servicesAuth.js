@@ -7,6 +7,10 @@ import {
   accessTokenLifeTime,
   refreshTokenLifeTime,
 } from '../constants/constantsUsers.js';
+import jwt from 'jsonwebtoken';
+import { SMTP } from '../constants/index.js';
+import { env } from '../utils/env.js';
+import { sendEmail } from '../utils/sendMail.js';
 
 const createSession = () => {
   const accessToken = randomBytes(30).toString('base64');
@@ -31,6 +35,7 @@ export const register = async (payload) => {
   }
 
   const hashPassword = await bcrypt.hash(password, 10);
+
   const data = await UserCollection.create({
     ...payload,
     password: hashPassword,
@@ -109,8 +114,66 @@ export const logout = async (sessionId) => {
 
 export const requestResetToken = async (email) => {
   const user = await UserCollection.findOne({ email });
+
   if (!user) {
     throw createHttpError(404, 'User not found');
   }
+
+  const resetToken = jwt.sign(
+    {
+      sub: user._id,
+      email, // Include user's email in the token payload
+    },
+    env('JWT_SECRET'), // Use JWT_SECRET from environment variables
+    {
+      expiresIn: '5m', // Token valid for 5 minutes
+    },
+  );
+
+  const resetLink = `${env('APP_DOMAIN')}/reset-password?token=${resetToken}`; // APP_DOMAIN + reset link
+
+  try {
+    await sendEmail({
+      from: env(SMTP.SMTP_FROM), // From email (Brevo)
+      to: email, // Recipient's email
+      subject: 'Reset your password',
+      html: `<p>Click <a href="${resetLink}">here</a> to reset your password!</p>`, // Email body with link
+    });
+  } catch (error) {
+    throw createHttpError(
+      500,
+      'Failed to send the email, please try again later.',
+    );
+  }
 };
+
+export const resetPassword = async (payload) => {
+  let entries;
+
+  try {
+    entries = jwt.verify(payload.token, env('JWT_SECRET'));
+  } catch (err) {
+    if (err instanceof Error) throw createHttpError(401, err.message);
+    throw err;
+  }
+
+  const user = await UserCollection.findOne({
+    email: entries.email,
+    _id: entries.sub,
+  });
+
+  if (!user) {
+    throw createHttpError(404, 'User not found');
+  }
+
+  const encryptedPassword = await bcrypt.hash(payload.password, 10);
+
+  await UserCollection.updateOne(
+    { _id: user._id },
+    { password: encryptedPassword },
+  );
+  // Remove current session after password reset
+  await SessionCollection.deleteOne({ userId: user._id });
+};
+
 export const findUser = (filter) => UserCollection.findOne(filter);

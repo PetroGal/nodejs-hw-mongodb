@@ -81,7 +81,7 @@ export const updateContact = async (contactId, payload) => {
   }
 };
 
-export const updateMovie = async (filter, data, options = {}) => {
+export const upgradeContact = async (filter, data, options = {}) => {
   const rawResult = await ContactCollection.findOneAndUpdate(filter, data, {
     includeResultMetadata: true,
     ...options,
