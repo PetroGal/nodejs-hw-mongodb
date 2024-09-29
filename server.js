@@ -7,6 +7,7 @@ import { env } from './src/utils/env.js';
 import { errorHandler } from './src/middlewares/errorHandler.js';
 import { notFoundHandler } from './src/middlewares/notFoundHandler.js';
 import authRouter from './src/routers/routersAuth.js';
+import { UPLOAD_DIR } from './src/constants/index.js';
 
 const port = Number(env('PORT', 3000));
 
@@ -31,9 +32,7 @@ export const setupServer = () => {
 
   app.use(errorHandler);
 
-  // app.use((req, res) => {
-  //   res.status(404).json({ message: 'Not found' });
-  // });
+  app.use('/uploads', express.static(UPLOAD_DIR));
 
   app.listen(port, () => console.log(`Server is running on port ${port}`));
 };
