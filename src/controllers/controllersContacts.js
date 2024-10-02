@@ -60,15 +60,50 @@ export const getContactByIdController = async (req, res) => {
   });
 };
 
-export const createContactController = async (req, res) => {
+export const createContactController = async (req, res, next) => {
   const { _id: userId } = req.user;
+  const { name, phoneNumber, contactType } = req.body;
 
-  const contact = await createContact({ ...req.body, userId });
-  res.status(201).json({
-    status: 201,
-    message: 'Successfully created a contact!',
-    data: contact,
-  });
+  if (!name || !phoneNumber || !contactType) {
+    return res.status(400).json({
+      status: 400,
+      message:
+        "Name is required. Phone number is required. 'contactType' is required",
+      data: {
+        message:
+          "Name is required. Phone number is required. 'contactType' is required",
+      },
+    });
+  }
+
+  let photoUrl;
+
+  if (req.file) {
+    // Handle file upload (to Cloudinary or local storage)
+    if (env('ENABLE_CLOUDINARY') === 'true') {
+      photoUrl = await saveFileToCloudinary(req.file);
+    } else {
+      photoUrl = await saveFileToUploadDir(req.file);
+    }
+  }
+
+  try {
+    console.log(req.body); // This will show the form data
+    console.log(req.file); // This will show the file data (if any)
+    const contact = await createContact({
+      ...req.body,
+      userId,
+      photo: photoUrl, // Add the photo URL if uploaded
+    });
+
+    res.status(201).json({
+      status: 201,
+      message: 'Successfully created a contact!',
+      data: contact,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const deleteContactController = async (req, res, next) => {
