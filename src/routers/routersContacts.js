@@ -28,8 +28,8 @@ contactsRouter.get(
 
 contactsRouter.post(
   '/contacts',
-  validateBody(createContactSchema),
   upload.single('photo'),
+  validateBody(createContactSchema),
   ctrlWrapper(createContactController),
 );
 
