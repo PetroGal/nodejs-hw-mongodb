@@ -28,6 +28,7 @@ contactsRouter.get(
 
 contactsRouter.post(
   '/contacts',
+
   validateBody(createContactSchema),
   ctrlWrapper(createContactController),
   upload.single('photo'),
