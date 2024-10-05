@@ -28,9 +28,10 @@ contactsRouter.get(
 
 contactsRouter.post(
   '/contacts',
-  upload.single('photo'),
+
   validateBody(createContactSchema),
   ctrlWrapper(createContactController),
+  upload.single('photo'),
 );
 
 contactsRouter.delete(

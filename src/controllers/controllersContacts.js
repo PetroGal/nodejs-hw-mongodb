@@ -110,17 +110,17 @@ export const deleteContactController = async (req, res, next) => {
   const { contactId } = req.params;
   const { _id: userId } = req.user;
 
+  if (!contactId) {
+    return next(createHttpError(400, 'Invalid contact ID'));
+  }
+
   const contact = await deleteContact(contactId, userId);
 
   if (!contact) {
-    next(createHttpError(404, 'Contact not found'));
-    return;
+    return next(createHttpError(404, 'Contact not found'));
   }
-  res.status(204).send();
 
-  if (!contactId) {
-    next(createHttpError(400, 'Invalid contact ID or missing file'));
-  }
+  res.status(204).send();
 };
 
 export const patchContactController = async (req, res, next) => {

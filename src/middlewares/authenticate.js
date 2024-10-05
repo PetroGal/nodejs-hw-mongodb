@@ -3,6 +3,11 @@ import createHttpError from 'http-errors';
 import * as servicesAuth from '../services/servicesAuth.js';
 
 const authenticate = async (req, res, next) => {
+  if (req.path === '/api-docs' || req.path === '/favicon.ico') {
+    return next();
+  }
+
+  console.log('Authorization:', req.headers['authorization']);
   const authorization = req.get('Authorization');
   console.log('Authorization:', authorization);
 
